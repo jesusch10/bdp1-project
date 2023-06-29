@@ -1,9 +1,9 @@
 # BDP1 project
 
-## 1. Computational challenge
+## 1. Computational challenge:
 The computational challenge consists on building an infrastructure to align 300 million of sequences against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains three different sites built on different Google Cloud projects to simulate the geographical distribution. The first site will be the High Throughput Computing (HTC) site, with more copies of the same program run in parallel. 
-## 2. High throughput computing (HTC) site
-### 2.1 Setting up the environment
+## 2. High throughput computing (HTC) site:
+### 2.1 Setting up the environment:
 HTC site is designed to run copies of the same program in parallel. It consists of one master node (htc-instance) and two working nodes (slave-2 has been created later as an image of slave-1). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/d855d570-032a-43db-ac41-2c2690403886)
@@ -29,7 +29,8 @@ vi /etc/fstab                 # Edit the fstab file to add this line: /dev/sdb1 
 mount -a                      # Mount all the filesystem listed in the fstab file
 chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
-Install the NFS server in the htc-instance:
+## 2.2 Installing the NFS server:
+In the htc-instance:
 ```
 yum install nfs-utils rpcbind
 systemctl enable nfs-server
@@ -44,7 +45,7 @@ systemctl status nfs
 vim /etc/exports             # Add this line: /data2  <private IP of the slave-1 instance (client)>(rw,sync,no_wdelay)
 exportfs -r
 ```
-Install the NFS client in the slave-1 instance:
+In the slave-1 instance:
 ```
 sudo su
 yum install nfs-utils
@@ -58,7 +59,8 @@ Display the final disk filesystem in each instance with `df -h`:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c2071a72-13ed-441a-9075-2c83a1bacad1)
 
-Installing HTCondor dependencies and packages both in htc-instance and slave-1 instance:
+## 2.3 Installing HTCondor dependencies and packages:
+Both in htc-instance and slave-1 instance:
 ```
 yum install wget
 wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
