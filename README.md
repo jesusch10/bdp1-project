@@ -47,5 +47,48 @@ umount /data2
 vim /etc/fstab             # Add this line: <private IP of the htc-instance (server)>:/data2 /data2   nfs defaults        0 0
 mount -a
 ```
+Display the final disk filesystem in each instance with `df -h`:
+
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c2071a72-13ed-441a-9075-2c83a1bacad1)
+
+Installing HTCondor dependencies and packages both in htc-instance and slave-1 instance:
+```
+yum install wget
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum localinstall epel-release-latest-7.noarch.rpm
+yum clean all
+wget http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo
+cp htcondor-stable-rhel7.repo /etc/yum.repos.d/
+yum install condor-all
+```
+In the htc-instance, next lines are added when running `vim /etc/condor/condor_config`:
+```
+CONDOR_HOST = <htc-insta private IP (master)>
+DAEMON_LIST = COLLECTOR, MASTER, NEGOTIATOR, STARTD, SCHEDD
+HOSTALLOW_READ = *
+HOSTALLOW_WRITE = *
+HOSTALLOW_ADMINISTRATOR = *
+```
+In the slave-1 instance, next lines are added when running `vim /etc/condor/condor_config`:
+```
+CONDOR_HOST = <htc-insta private IP (master)>
+DAEMON_LIST = MASTER, STARTD
+HOSTALLOW_READ = *
+HOSTALLOW_WRITE = *
+HOSTALLOW_ADMINISTRATOR = *
+```
+Enabling and starting HTCondor both in the htc-instance and slave-1 instance:
+```
+systemctl start condor
+systemctl enable condor
+```
+Display the HTCondor status with `systemctl status condor`:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/48e3afdf-a4b0-4b6e-9bfb-6eed38eafa17)
+
+
+
+
+
+
 
