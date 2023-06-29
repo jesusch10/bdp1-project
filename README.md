@@ -104,6 +104,17 @@ vim /etc/exports                      # Add this line: /data2  <private IP of th
 exportfs -r
 ```
 Finally, the command `mount -a` is run in the slave-2 instance.
+## 2.4 Submitting a Burrows-Wheeler Aligner (BWA) job:
+The purpose is to align 5 reads of a patient against the entire human genome using BWA. The BWA tool is installed and the hg19 database is downloaded in the htc-instance with:
+```
+cd /data2
+wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
+tar -xvzf BDP1_2022.tgz
+yum install gcc gcc-c++
+yum install zlib
+yum install zlib-devel
+yum install -y bwa                    # This command is also run in the two worker nodes
+```
 
 
 
