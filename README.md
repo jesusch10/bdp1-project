@@ -41,10 +41,13 @@ systemctl start rpcbind
 systemctl start nfs-server
 systemctl start nfs-lock
 systemctl start nfs-idmap
-systemctl status nfs
 vim /etc/exports             # Add this line: /data2  <private IP of the slave-1 instance (client)>(rw,sync,no_wdelay)
 exportfs -r
 ```
+Display the NFS status with `systemctl status nfs`:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/19d229ac-a4b1-459c-9fa4-5bee67d5a851)
+
 In the slave-1 instance:
 ```
 sudo su
