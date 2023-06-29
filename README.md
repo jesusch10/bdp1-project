@@ -18,7 +18,33 @@ sudo su                       # Become superuser
 fdisk /dev/sdb                # Access the partition menu and type commands: p, n, p (keep defaults), w
 mkfs.ext4 /dev/sdb1           # Create the ext4 filesystem
 mkdir /data2                  # Create a mountpoint for the new filesystem
-vi /etc/fstab                 # Edit the fstab file to add this line: `/dev/sdb1     /data2  ext4 defaults 0 0`
+vi /etc/fstab                 # Edit the fstab file to add this line: /dev/sdb1     /data2  ext4 defaults 0 0
 mount -a                      # Mount all the filesystem listed in the fstab file
-chmod 775 /data2/             # Change the permissions
+chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
+Install the NFS server in the htc-instance:
+```
+yum install nfs-utils rpcbind
+systemctl enable nfs-server
+systemctl enable rpcbind
+systemctl enable nfs-lock
+systemctl enable nfs-idmap
+systemctl start rpcbind
+systemctl start nfs-server
+systemctl start nfs-lock
+systemctl start nfs-idmap
+systemctl status nfs
+vim /etc/exports             # Add this line: /data2  <private IP of the slave-1 instance (client)>(rw,sync,no_wdelay)
+exportfs -r
+```
+Install the NFS client in the slave-1 instance:
+```
+sudo su
+yum install nfs-utils
+mkdir /data2
+mount -t nfs -o ro,nosuid <private IP of the htc-instance (server)>:/data2 /data2
+umount /data2
+vim /etc/fstab             # Add this line: <private IP of the htc-instance (server)>:/data2 /data2   nfs defaults        0 0
+mount -a
+```
+
