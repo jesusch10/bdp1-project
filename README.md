@@ -88,7 +88,7 @@ HOSTALLOW_ADMINISTRATOR = *
 ```
 Enabling and starting HTCondor both in the htc-instance and slave-1 instance:
 ```
-systemctl start condor
+systemctl restart condor
 systemctl enable condor
 ```
 Display the HTCondor status with `systemctl status condor`:
