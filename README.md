@@ -47,4 +47,5 @@ umount /data2
 vim /etc/fstab             # Add this line: <private IP of the htc-instance (server)>:/data2 /data2   nfs defaults        0 0
 mount -a
 ```
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c2071a72-13ed-441a-9075-2c83a1bacad1)
 
