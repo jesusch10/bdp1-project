@@ -93,7 +93,7 @@ systemctl enable condor
 ```
 Display the HTCondor status with `systemctl status condor`:
 
-![image](https://github.com/jesusch10/bdp1-project/assets/136498796/48e3afdf-a4b0-4b6e-9bfb-6eed38eafa17)
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/4213f34b-671f-4423-adf1-e480c6c2ffa9)
 
 The slave-2 instance is created in Google Cloud as an image of the slave-1 image. Then the private IP slave-2 instance is added to the exports file of the htc-instance (server):
 ```
