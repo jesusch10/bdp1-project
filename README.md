@@ -1,4 +1,4 @@
-# BDP! project
+# BDP1 project
 
 ## COMPUTATIONAL CHALLENGE
 The computational challenge consists on building an infrastructure to align 300 million of sequences against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains three different sites built on different Google Cloud projects to simulate the geographical distribution. The first site will be the High Throughput Computing (HTC) site, with more copies of the same program run in parallel. 
