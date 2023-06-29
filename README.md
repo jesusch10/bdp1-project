@@ -86,6 +86,12 @@ Display the HTCondor status with `systemctl status condor`:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/48e3afdf-a4b0-4b6e-9bfb-6eed38eafa17)
 
+The slave-2 instance is created in Google Cloud as an image of the slave-1 image. Then the private IP slave-2 instance is added to the exports file of the htc-instance (server):
+```
+vim /etc/exports                      # Add this line: /data2  <private IP of the slave-2 instance (client)>(rw,sync,no_wdelay)
+exportfs -r
+```
+Finally, the command `mount -a` is run in the slave-2 instance.
 
 
 
