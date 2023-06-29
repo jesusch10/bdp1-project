@@ -115,7 +115,16 @@ yum install zlib
 yum install zlib-devel
 yum install -y bwa                    # This command is also run in the two worker nodes
 ```
-
+A similar way to install BWA:
+```
+cp /data2/BDP1_2022/hg19/bwa-0.7.15.tar .
+yum install gcc gcc-c++
+yum install zlib
+yum install zlib-devel
+tar -xvf bwa-0.7.15.tar
+cd bwa-0.7.15/
+make
+```
 
 
 
