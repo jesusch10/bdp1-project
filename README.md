@@ -148,7 +148,7 @@ cd bwa-0.7.15/
 make
 ```
 ### 3.2 Setting up WebDAV
-In the `storage-1` instance (server):
+In the `storage-1` instance (WebDAV server):
 ```
 sudo su
 yum install wget
@@ -169,12 +169,14 @@ vim /etc/httpd/conf.d/webdav.conf                                               
 setenforce 0                                                                                    # Disable selinux if enabled
 systemctl restart httpd.service
 ```
-In the `hpc-instance` instance (client):
+In the `hpc-instance` instance (WebDAV client):
 ```
 sudo su
 yum install cadaver
+cadaver http://10.128.0.12/webdav/       # Access the WebDAV server with its private IP
+exit
 ```
-Thanks to the previous firewall rules created for the site 1, it is not necessary a new one to allow the access from the WebDAV client (`hpc-instance`) to the WebDAV server (`storage-1`).
+Thanks to the previous firewall rules created for the site 1, it is not necessary a new one to allow the access from the WebDAV client to the WebDAV server.
 
 
 
