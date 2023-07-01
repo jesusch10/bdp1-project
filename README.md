@@ -129,20 +129,23 @@ cd bwa-0.7.15/
 make
 ```
 ## 3. HPC site:
-The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively.
+The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
 
 ### 3.1 Fetching the data and installing BWA in the `hpc-instance`:
 ```
+sudo su
 yum install gcc gcc-c++
 yum install zlib
 yum install zlib-devel
 yum install make
 yum install wget
+mkdir /data2/
+cd /data2
 wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
+cd /data2/BDP1_2022/hg19
 tar -xvzf BDP1_2022.tgz
-cp /data2/BDP1_2022/hg19/bwa-0.7.15.tar .
 tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
@@ -169,7 +172,7 @@ vim /etc/httpd/conf.d/webdav.conf                                               
 setenforce 0                                                                                    # Disable selinux if enabled
 systemctl restart httpd.service
 ```
-In the `hpc-instance` instance (WebDAV client):
+In the `hpc-instance` (WebDAV client):
 ```
 sudo su
 yum install cadaver
