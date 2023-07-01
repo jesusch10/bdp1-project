@@ -3,17 +3,17 @@
 ## 1. Computational challenge:
 The computational challenge consists on building an infrastructure to align 300 million of sequences against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains three different sites built on different Google Cloud projects to simulate the geographical distribution. The first site will be the High Throughput Computing (HTC) site, with more copies of the same program run in parallel. 
 ## 2. High throughput computing (HTC) site:
-### 2.1 Setting up the environment:
-HTC site is designed to run copies of the same program in parallel. It consists of one master node (htc-instance) and two working nodes (slave-2 has been created later as an image of slave-1). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
+HTC site is designed to run copies of the same program in parallel. It consists of one master node (htc-instance) and two working nodes (slave-1 and slave-2, which has been created later as an image of slave-1). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/d855d570-032a-43db-ac41-2c2690403886)
 
+### 2.1 Setting up the environment:
 Commands below show how to create a SSH key along with its `.pub` file that then is manually added to the instance metadata, and how to access the VM instances:
 ```
 ssh-keygen -t rsa -f ./key_project
 ssh -i key_project jesus@<instance_external_ip>
 ```
-A storage site is created with 50GB and interconnected to the htc-instance through Google Cloud. Then, next firewall entry rules are configured:
+A storage site is created with 50GB and interconnected to the `htc-instance` through Google Cloud. Then, next firewall entry rules are configured:
 1. Transmission Control Protocol (TCP) for 0 - 65535 ports, so the nodes are able to communicate between them through HTCondor, and to share a volume through the Network File System server (NFS).
 2. Internet Control Message Protocol (ICMP) for all ports, so the ping requests are allowed.
 3. TCP for 22 port, so the Secure Shell (SSh) is allowed.
@@ -30,7 +30,7 @@ mount -a                      # Mount all the filesystem listed in the fstab fil
 chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
 ## 2.2 Installing the NFS server:
-In the htc-instance:
+In the `htc-instance`:
 ```
 yum install nfs-utils rpcbind
 systemctl enable nfs-server
@@ -48,7 +48,7 @@ Display the NFS status with `systemctl status nfs`:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/19d229ac-a4b1-459c-9fa4-5bee67d5a851)
 
-In the slave-1 instance:
+In the `slave-1` instance:
 ```
 sudo su
 yum install nfs-utils
@@ -63,7 +63,7 @@ Display the final disk filesystem in each instance with `df -h`:
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c2071a72-13ed-441a-9075-2c83a1bacad1)
 
 ## 2.3 Installing HTCondor dependencies and packages:
-Both in htc-instance and slave-1 instance:
+Both in `htc-instance` and `slave-1` instance:
 ```
 yum install wget
 wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -73,7 +73,7 @@ wget http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo
 cp htcondor-stable-rhel7.repo /etc/yum.repos.d/
 yum install condor-all
 ```
-In the htc-instance, next lines are added when running `vim /etc/condor/condor_config`:
+In the `htc-instance`, next lines are added when running `vim /etc/condor/condor_config`:
 ```
 CONDOR_HOST = <htc-insta private IP (master)>
 DAEMON_LIST = COLLECTOR, MASTER, NEGOTIATOR, STARTD, SCHEDD
@@ -81,7 +81,7 @@ HOSTALLOW_READ = *
 HOSTALLOW_WRITE = *
 HOSTALLOW_ADMINISTRATOR = *
 ```
-In the slave-1 instance, next lines are added when running `vim /etc/condor/condor_config`:
+In the `slave-1` instance, next lines are added when running `vim /etc/condor/condor_config`:
 ```
 CONDOR_HOST = <htc-insta private IP (master)>
 DAEMON_LIST = MASTER, STARTD
@@ -89,7 +89,7 @@ HOSTALLOW_READ = *
 HOSTALLOW_WRITE = *
 HOSTALLOW_ADMINISTRATOR = *
 ```
-Enabling and starting HTCondor both in the htc-instance and slave-1 instance:
+Enabling and starting HTCondor both in the `htc-instance` and `slave-1` instance:
 ```
 systemctl restart condor
 systemctl enable condor
@@ -98,14 +98,17 @@ Display the HTCondor status with `systemctl status condor`:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/4213f34b-671f-4423-adf1-e480c6c2ffa9)
 
-The slave-2 instance is created in Google Cloud as an image of the slave-1 image. Then the private IP slave-2 instance is added to the exports file of the htc-instance (server):
+The `slave-2` instance is created in Google Cloud as an image of the `slave-1` image. Then the private IP `slave-2` instance is added to the exports file of the `htc-instance` (server):
 ```
 vim /etc/exports        # Add this line: /data2  <private IP of the slave-2 instance (client)>(rw,sync,no_wdelay)
 exportfs -r
 ```
-Finally, the command `mount -a` is run in the slave-2 instance.
+Finally, in the `slave-2` instance:
+```
+mount -a
+```
 ## 2.4 Submitting a Burrows-Wheeler Aligner (BWA) job:
-The purpose is to align 5 reads of a patient against the entire human genome using BWA. The BWA tool is installed and the hg19 database is downloaded in the htc-instance with:
+The purpose is to align 5 reads of a patient against the entire human genome using BWA. The BWA tool is installed and the hg19 database is downloaded in the `htc-instance` with:
 ```
 cd /data2
 wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
@@ -121,6 +124,29 @@ cp /data2/BDP1_2022/hg19/bwa-0.7.15.tar .
 yum install gcc gcc-c++
 yum install zlib
 yum install zlib-devel
+tar -xvf bwa-0.7.15.tar
+cd bwa-0.7.15/
+make
+```
+## 3. High Performance Computing (HPC) site:
+The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (hpc-instance) and one working node (storage-1), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively.
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
+
+### 3.1 Setting up the environment:
+The site 3 works as storage for the other 2 sites, with which it is connected.
+For the HPC site I selected as type of machine an e2-standard-8, with 8 vCPU and 32 GB of memory. In this case the starting disk had 50 GB of memory, which allowed to download the files of the hg19 database. It is not necessary to download HT-Condor, since BWA can run only on the main node called hpc-instance. In the HPC site all the computational power is used to speed-up a single job, therefore there is no need to use HT-Condor.
+I installed BWA on the hpc-instance using the following commands:
+### 3.2 Fetching the data and installing BWA in the `hpc-instance`:
+```
+yum install gcc gcc-c++
+yum install zlib
+yum install zlib-devel
+yum install make
+yum install wget
+wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
+tar -xvzf BDP1_2022.tgz
+cp /data2/BDP1_2022/hg19/bwa-0.7.15.tar .
 tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
