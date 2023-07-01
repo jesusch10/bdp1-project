@@ -1,8 +1,8 @@
 # BDP1 project
 
 ## 1. Computational challenge:
-The computational challenge consists on building an infrastructure to align 300 million of sequences against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains three different sites built on different Google Cloud projects to simulate the geographical distribution. The first site will be the High Throughput Computing (HTC) site, with more copies of the same program run in parallel. 
-## 2. High throughput computing (HTC) site:
+The computational challenge consists on building an infrastructure to align 554.000 sequences per patient against the HG19 against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains two different sites: the High Throughput Computing (HTC) site and the High Performance Computing (HPC) site, both built on Google Cloud with different subnets specified in the network settings to simulate the geographical distribution.
+## 2. HTC site:
 HTC site is designed to run copies of the same program in parallel. It consists of one master node (`htc-instance`) and two working nodes (`slave-1` and `slave-2`, which has been created later as an image of `slave-1`). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/d855d570-032a-43db-ac41-2c2690403886)
@@ -107,7 +107,7 @@ Finally, in the `slave-2` instance:
 ```
 mount -a
 ```
-## 2.4 Submitting a Burrows-Wheeler Aligner (BWA) job:
+## 2.4 Submitting a BWA job:
 The purpose is to align 5 reads of a patient against the entire human genome using BWA. The BWA tool is installed and the hg19 database is downloaded in the `htc-instance` with:
 ```
 cd /data2
@@ -128,7 +128,7 @@ tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
 ```
-## 3. High Performance Computing (HPC) site:
+## 3. HPC site:
 The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively.
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
@@ -157,12 +157,12 @@ yum localinstall epel-release-latest-7.noarch.rpm                               
 yum clean all
 yum install httpd                                                                               # Install Apache
 sed -i 's/^/#&/g' /etc/httpd/conf.d/welcome.conf                                                # Disable Apache's default welcome page
-sed -i "s/Options Indexes FollowSymLinks/Options FollowSymLinks/" /etc/httpd/conf/httpd.conf    # Prevent the Apache web server from displaying files within the web directory:
+sed -i "s/Options Indexes FollowSymLinks/Options FollowSymLinks/" /etc/httpd/conf/httpd.conf    # Prevent the Apache web server from displaying files within the web directory
 systemctl start httpd.service                                                                   # Start the service 
 mkdir /var/www/html/webdav
 chown -R apache:apache /var/www/html
 chmod -R 755 /var/www/html
-htpasswd -c /etc/httpd/.htpasswd user001                                                        # Create an account with "user001" as user name
+htpasswd -c /etc/httpd/.htpasswd user001                                                        # Create an account with "user001" as username
 chown root:apache /etc/httpd/.htpasswd
 chmod 640 /etc/httpd/.htpasswd
 vim /etc/httpd/conf.d/webdav.conf                                                               # Create a virtual host for WebDAV whose written content is in the "webdav.conf" file of this repository
@@ -170,6 +170,10 @@ setenforce 0                                                                    
 systemctl restart httpd.service
 ```
 In the `hpc-instance` instance (client):
+```
+sudo su
+yum install cadaver
+```
 
 
 
