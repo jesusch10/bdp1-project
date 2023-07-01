@@ -1,7 +1,7 @@
 # BDP1 project
 
 ## 1. Computational challenge:
-The computational challenge consists on building an infrastructure to align 554.000 sequences per patient against the HG19 against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains two different sites: the High Throughput Computing (HTC) site and the High Performance Computing (HPC) site, both built on Google Cloud with different subnets specified in the network settings to simulate the geographical distribution.
+The computational challenge consists on building an infrastructure to align 554.000 sequences per patient against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains two different sites: the High Throughput Computing (HTC) site and the High Performance Computing (HPC) site, both built on Google Cloud with different subnets specified in the network settings to simulate the geographical distribution.
 ## 2. HTC site:
 HTC site is designed to run copies of the same program in parallel. It consists of one master node (`htc-instance`) and two working nodes (`slave-1` and `slave-2`, which has been created later as an image of `slave-1`). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
@@ -107,33 +107,7 @@ Finally, in the `slave-2` instance:
 ```
 mount -a
 ```
-## 2.4 Submitting a BWA job:
-The purpose is to align 5 reads of a patient against the entire human genome using BWA. The BWA tool is installed and the hg19 database is downloaded in the `htc-instance` with:
-```
-cd /data2
-wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
-tar -xvzf BDP1_2022.tgz
-yum install gcc gcc-c++
-yum install zlib
-yum install zlib-devel
-yum install -y bwa                    # This command is also run in the two worker nodes
-```
-A similar way to install BWA:
-```
-cp /data2/BDP1_2022/hg19/bwa-0.7.15.tar .
-yum install gcc gcc-c++
-yum install zlib
-yum install zlib-devel
-tar -xvf bwa-0.7.15.tar
-cd bwa-0.7.15/
-make
-```
-## 3. HPC site:
-The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
-
-![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
-
-### 3.1 Fetching the data and installing BWA in the `hpc-instance`:
+## 2.4 Fetching the data and installing BWA in the `htc-instance`:
 ```
 sudo su
 yum install gcc gcc-c++
@@ -144,12 +118,19 @@ yum install wget
 mkdir /data2/
 cd /data2
 wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
-cd /data2/BDP1_2022/hg19
 tar -xvzf BDP1_2022.tgz
+cd /data2/BDP1_2022/hg19
 tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
 ```
+## 3. HPC site:
+The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
+
+### 3.1 Fetching the data and installing BWA in the `hpc-instance`:
+Same steps as described in point 2.4.
 ### 3.2 Setting up WebDAV
 In the `storage-1` instance (WebDAV server):
 ```
@@ -180,6 +161,25 @@ cadaver http://10.128.0.12/webdav/       # Access the WebDAV server with its pri
 exit
 ```
 Thanks to the previous firewall rules created for the site 1, it is not necessary a new one to allow the access from the WebDAV client to the WebDAV server.
+### 3.3 Running a BWA test:
+The first time the BWA program is executed, the real execution time is 19.460 seconds, which is significantly higher than the CPU execution time because the database should be uploaded. In next executions, the real execution time is slightly higher than the CPU execution time because the database is stored in the cache. This preprocess is a scalar operation that cannot be parallelized according to the the Amdahl's law, so the low speedup results showed below are a consequence of the small dimension of the job. Therefore, BWA effectively works on bigger tasks since the postprocesses suppose the major part of operations that can be parallelized.
+
+
+
+/// Dirty notes:
+· Make command in slaves?
+· Modified align.py in HPC?
+1: 1.363 sec
+1.290 sec
+1.292 sec
+1.275 sec
+1.260 sec ç
+2: 1.324 sec
+4: 1.363 sec
+6: 1.320 sec
+8: 2.859 sec
+
+
 
 
 
