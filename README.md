@@ -174,6 +174,7 @@ In the `hpc-instance` instance (client):
 sudo su
 yum install cadaver
 ```
+Thanks to the previous firewall rules created for the site 1, it is not necessary a new one to allow the access from the WebDAV client (`hpc-instance`) to the WebDAV server (`storage-1`).
 
 
 
