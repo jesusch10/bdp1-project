@@ -3,7 +3,7 @@
 ## 1. Computational challenge:
 The computational challenge consists on building an infrastructure to align 300 million of sequences against the human reference genome using the Burrows-Wheeler Aligner (BWA). The infrastructure contains three different sites built on different Google Cloud projects to simulate the geographical distribution. The first site will be the High Throughput Computing (HTC) site, with more copies of the same program run in parallel. 
 ## 2. High throughput computing (HTC) site:
-HTC site is designed to run copies of the same program in parallel. It consists of one master node (htc-instance) and two working nodes (slave-1 and slave-2, which has been created later as an image of slave-1). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
+HTC site is designed to run copies of the same program in parallel. It consists of one master node (`htc-instance`) and two working nodes (`slave-1` and `slave-2`, which has been created later as an image of `slave-1`). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/d855d570-032a-43db-ac41-2c2690403886)
 
@@ -25,7 +25,7 @@ sudo su                       # Become superuser
 fdisk /dev/sdb                # Access the partition menu and type commands: p, n, p (keep defaults), w
 mkfs.ext4 /dev/sdb1           # Create the ext4 filesystem
 mkdir /data2                  # Create a mountpoint for the new filesystem
-vi /etc/fstab                 # Edit the fstab file to add this line: /dev/sdb1     /data2  ext4 defaults 0 0
+vim /etc/fstab                # Edit the fstab file to add this line: /dev/sdb1     /data2  ext4 defaults 0 0
 mount -a                      # Mount all the filesystem listed in the fstab file
 chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
@@ -129,15 +129,11 @@ cd bwa-0.7.15/
 make
 ```
 ## 3. High Performance Computing (HPC) site:
-The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (hpc-instance) and one working node (storage-1), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively.
+The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively.
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3cc3cfa0-de79-4dab-9183-507ab852034a)
 
-### 3.1 Setting up the environment:
-The site 3 works as storage for the other 2 sites, with which it is connected.
-For the HPC site I selected as type of machine an e2-standard-8, with 8 vCPU and 32 GB of memory. In this case the starting disk had 50 GB of memory, which allowed to download the files of the hg19 database. It is not necessary to download HT-Condor, since BWA can run only on the main node called hpc-instance. In the HPC site all the computational power is used to speed-up a single job, therefore there is no need to use HT-Condor.
-I installed BWA on the hpc-instance using the following commands:
-### 3.2 Fetching the data and installing BWA in the `hpc-instance`:
+### 3.1 Fetching the data and installing BWA in the `hpc-instance`:
 ```
 yum install gcc gcc-c++
 yum install zlib
@@ -151,8 +147,29 @@ tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
 ```
-
-
+### 3.2 Setting up WebDAV
+In the `storage-1` instance (server):
+```
+sudo su
+yum install wget
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum localinstall epel-release-latest-7.noarch.rpm                                               # Enable the epel repository as done for condor
+yum clean all
+yum install httpd                                                                               # Install Apache
+sed -i 's/^/#&/g' /etc/httpd/conf.d/welcome.conf                                                # Disable Apache's default welcome page
+sed -i "s/Options Indexes FollowSymLinks/Options FollowSymLinks/" /etc/httpd/conf/httpd.conf    # Prevent the Apache web server from displaying files within the web directory:
+systemctl start httpd.service                                                                   # Start the service 
+mkdir /var/www/html/webdav
+chown -R apache:apache /var/www/html
+chmod -R 755 /var/www/html
+htpasswd -c /etc/httpd/.htpasswd user001                                                        # Create an account with "user001" as user name
+chown root:apache /etc/httpd/.htpasswd
+chmod 640 /etc/httpd/.htpasswd
+vim /etc/httpd/conf.d/webdav.conf                                                               # Create a virtual host for WebDAV whose written content is in the "webdav.conf" file of this repository
+setenforce 0                                                                                    # Disable selinux if enabled
+systemctl restart httpd.service
+```
+In the `hpc-instance` instance (client):
 
 
 
