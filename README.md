@@ -168,7 +168,7 @@ vim align.py                                       # Written content is in the "
 python align.py ./Patients/patient1/read_1.fa      # This command is executed several times changing the number of cores of the instance
 ```
 
-![image](https://github.com/jesusch10/bdp1-project/assets/136498796/21248717-d16c-4763-bc1d-a470d26ba0cd)
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/43014e8b-0197-4fbd-8d61-f5bc4e305a28)
 
 The first time the BWA program is executed, the real execution time is significantly higher than the CPU execution time because the database should be uploaded. In next executions, the real execution time is slightly higher than the CPU execution time because the database is stored in the cache. This preprocess is a scalar operation that cannot be parallelized according to the the Amdahl's law, so the low speedup results showed below are a consequence of the small dimension of the job. Therefore, BWA effectively works on bigger tasks since the postprocesses suppose the major part of operations that can be parallelized.
 
