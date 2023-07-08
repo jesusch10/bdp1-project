@@ -141,6 +141,11 @@ After checking the time taken by each job with `cat read_*.out | grep "Total exe
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/7867b4d9-8fa3-4b33-8ec0-3a1b46b70b20)
 
+
+The time results among nodes are not very consistent because of the geographical distribution and CPU usage, which is slowed down probably due to an excessive use of RAM.  Therefore, in the next HPC site, the challenge is performed in a machine containing more than 8 GB of RAM (minimum recommended for BWA).
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/3a7d15e7-1eee-47fc-b44f-b6dbce4cf3c0)
+
 ## 3. HPC site:
 The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
 
