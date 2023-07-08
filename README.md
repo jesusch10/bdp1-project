@@ -109,13 +109,10 @@ mount -a
 ```
 ## 2.4 Fetching the data and installing BWA in the `htc-instance`:
 ```
-sudo su
 yum install gcc gcc-c++
 yum install zlib
 yum install zlib-devel
 yum install make
-yum install wget
-mkdir /data2/
 cd /data2
 wget https://pandora.infn.it/public/bdp12022tgz/dl/BDP1_2022.tgz
 tar -xvzf BDP1_2022.tgz
