@@ -1,0 +1,23 @@
+# ########## The program that will be executed #######
+Executable = align.py
+number = $(Process)+1
+# ########### Input Sandbox #########################
+Input = /data2/BDP1_2022/hg19/Patients/patient1/read_$INT(number).fa
+# Can contain standard input
+transfer_input_files = /data2/BDP1_2022/hg19/Patients/patient1/read_$INT(number).fa
+## Arguments that will be passed to the executable ##
+Arguments = /data2/BDP1_2022/hg19/Patients/patient1/read_$INT(number).fa
+# ##### Output Sandbox ###############################
+Log = read_$INT(number).log
+# will contain condor log
+Output = read_$INT(number).out
+# will contain the standard output
+Error = read_$INT(number).error
+# will contain the standard error
+transfer_output_files = read_$INT(number).sam.gz, read_$INT(number).sai, md5.txt
+# ############# condor control variables #############
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+Universe = vanilla
+# ####################################################
+Queue 6
