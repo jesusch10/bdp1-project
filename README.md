@@ -120,7 +120,7 @@ cd /data2/BDP1_2022/hg19
 tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
-chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
+chmod -R 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
 ## 2.5 Running a BWA test:
 In the `htc-instance`:
@@ -194,10 +194,7 @@ python align.py ./Patients/patient1/read_1.fa      # This command is executed se
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/43014e8b-0197-4fbd-8d61-f5bc4e305a28)
 
 The first time the BWA program is executed, the real execution time is significantly higher than the CPU execution time because the database should be uploaded. In next executions, the real execution time is slightly higher than the CPU execution time because the database is stored in the cache. This preprocess is a scalar operation that cannot be parallelized according to the the Amdahl's law, so the low speedup results showed below are a consequence of the small dimension of the job. Therefore, BWA effectively works on bigger tasks since the postprocesses suppose the major part of operations that can be parallelized.
-
-
-
-
+## 4. Working with containers in the HTC site:
 Installation of Docker on the three nodes:
 ```
 sudo su
@@ -212,9 +209,11 @@ usermod -aG docker condor               # Add HTCondor to the Docker group so it
 ```
 In the three nodes, next lines are added when running `vim /etc/condor/condor_config`:
 ```
-DOCKER_VOLUMES = BDP1_2022                  # Name of the Docker Volume that HTCondor creates
-DOCKER_VOLUME_DIR_BDP1_2022 = /data2        # Host path where HTCondor stores the Docker Volume
-DOCKER_MOUNT_VOLUMES = BDP1_2022            # Docker Volume that HTCondor mounts
+DOCKER_VOLUMES = BDP1_2022                                          # Name of the Docker Volume that HTCondor creates
+DOCKER_VOLUME_DIR_BDP1_2022 = /data2                                # Host path where HTCondor stores the Docker Volume
+DOCKER_MOUNT_VOLUMES = BDP1_2022                                    # Docker Volume that HTCondor mounts
+SLOT_TYPE_1 = cpus =100% , ram =100% , disk =100% , swap =100%      # To overcome possible memory limit
+NUM_SLOT_TYPE_1 = 1
 ```
 Running HTCondor with the new configuration file:
 ```
@@ -225,4 +224,12 @@ Checking all HTCondor nodes have Docker installed and have the volume mounted wi
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/1473a2f6-7e08-4d4d-a26c-0e86c53fc5ae)
 
-
+Creating and pushing the Docker image:
+```
+vim Dockerfile                               # Written content is in the Dockerfile of this repository
+docker build -t jesuschc10/bdp1-image .
+docker login -u jesuschc10
+docker push jesuschc10/bdp1-image
+vim docker_batch.job                        # Written content is in the "docker_batch.job" file of this repository
+```
+However, when running `condor_submit docker_batch.job` all the jobs are held because Docker has gone over memory limit. Even setting an instance with larger RAM, the problem is not either solved.
