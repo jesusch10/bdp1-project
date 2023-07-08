@@ -27,7 +27,6 @@ mkfs.ext4 /dev/sdb1           # Create the ext4 filesystem
 mkdir /data2                  # Create a mountpoint for the new filesystem
 vim /etc/fstab                # Edit the fstab file to add this line: /dev/sdb1     /data2  ext4 defaults 0 0
 mount -a                      # Mount all the filesystem listed in the fstab file
-chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
 ## 2.2 Installing the NFS server:
 In the `htc-instance`:
@@ -105,7 +104,7 @@ exportfs -r
 ```
 Finally, in the `slave-2` instance:
 ```
-mount -a
+sudo mount -a
 ```
 ## 2.4 Fetching the data and installing BWA in the `htc-instance`:
 ```
@@ -120,6 +119,7 @@ cd /data2/BDP1_2022/hg19
 tar -xvf bwa-0.7.15.tar
 cd bwa-0.7.15/
 make
+chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
 ## 3. HPC site:
 The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
