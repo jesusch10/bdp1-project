@@ -29,7 +29,7 @@ mkdir /data2                  # Create a mountpoint for the new filesystem
 vim /etc/fstab                # Edit the fstab file to add this line: /dev/sdb1     /data2  ext4 defaults 0 0
 mount -a                      # Mount all the filesystem listed in the fstab file
 ```
-## 2.2 Installing the NFS server:
+### 2.2 Installing the NFS server:
 In the `htc-instance`:
 ```
 yum install nfs-utils rpcbind
@@ -62,7 +62,7 @@ Display the final disk filesystem in each instance with `df -h`:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c2071a72-13ed-441a-9075-2c83a1bacad1)
 
-## 2.3 Installing HTCondor dependencies and packages:
+### 2.3 Installing HTCondor dependencies and packages:
 Both in `htc-instance` and `slave-1` instance:
 ```
 yum install wget
@@ -107,7 +107,7 @@ Finally, in the `slave-2` instance:
 ```
 sudo mount -a
 ```
-## 2.4 Fetching the data and installing BWA in the `htc-instance`:
+### 2.4 Fetching the data and installing BWA in the `htc-instance`:
 ```
 yum install gcc gcc-c++
 yum install zlib
@@ -122,7 +122,7 @@ cd bwa-0.7.15/
 make
 chmod -R 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
-## 2.5 Running a BWA test:
+### 2.5 Running a BWA test:
 In the `htc-instance`:
 ```
 cd ~
