@@ -5,7 +5,7 @@ The computational challenge consists on building an infrastructure to align 554.
 ## 2. HTC site:
 HTC site is designed to run copies of the same program in parallel. It consists of one master node (`htc-instance`) and two working nodes (`slave-1` and `slave-2`, which has been created later as an image of `slave-1`). All instances run the CentOS 7 operating system with e2-standard-2 type machine (2 vCPUs and 8 GB of memory).
 
-![image](https://github.com/jesusch10/bdp1-project/assets/136498796/d855d570-032a-43db-ac41-2c2690403886)
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/b6b1b1a2-73fa-4619-a79f-6244f922d45b)
 
 ### 2.1 Setting up the environment:
 Commands below show how to create a SSH key along with its `.pub` file that then is manually added to the instance metadata, and how to access the VM instances:
