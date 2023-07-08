@@ -122,12 +122,25 @@ make
 chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
 ## 2.5 Running a BWA test:
+In the `htc-instance`:
 ```
 cd ~
-vim bwa_batch.job             # Written content is in the "bwa_batch.job" file of this repository
-vim align.py                  # Written content is in the "align.py" file of this repository
-
+vim bwa_batch.job                 # Written content is in the "bwa_batch.job" file of this repository
+vim align.py                      # Written content is in the "align.py" file of this repository
+condor_submit bwa_batch . job     # Job submission
 ```
+Retrieving information about jobs in queue with `condor_q`:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/68f2d14c-b65e-47e1-9084-32fad0144086)
+
+Checking the three nodes in the cluster are working with `condor_status`:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/c84c2bcd-c41e-4db5-91b7-662ce4397028)
+
+After checking the time taken by each job with `cat read_*.out | grep "Total execution time:"`, the average execution time per single job is 86.828 seconds:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/7867b4d9-8fa3-4b33-8ec0-3a1b46b70b20)
+
 ## 3. HPC site:
 The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
 
