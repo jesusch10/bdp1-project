@@ -128,7 +128,7 @@ In the `htc-instance`:
 cd ~
 vim bwa_batch.job                 # Written content is in the "bwa_batch.job" file of this repository
 vim align.py                      # Written content is in the "align.py" file of this repository
-condor_submit bwa_batch . job     # Job submission
+condor_submit bwa_batch . job     # Job submission as NORMAL user, not root
 ```
 Retrieving information about jobs in queue with `condor_q`:
 
@@ -194,3 +194,35 @@ python align.py ./Patients/patient1/read_1.fa      # This command is executed se
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/43014e8b-0197-4fbd-8d61-f5bc4e305a28)
 
 The first time the BWA program is executed, the real execution time is significantly higher than the CPU execution time because the database should be uploaded. In next executions, the real execution time is slightly higher than the CPU execution time because the database is stored in the cache. This preprocess is a scalar operation that cannot be parallelized according to the the Amdahl's law, so the low speedup results showed below are a consequence of the small dimension of the job. Therefore, BWA effectively works on bigger tasks since the postprocesses suppose the major part of operations that can be parallelized.
+
+
+
+
+Installation of Docker on the three nodes:
+```
+sudo su
+yum install -y yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl start docker
+systemctl enable docker
+usermod -aG docker ${USER}              # In advance, adding sudo to each Docker command will not be necessary
+usermod -aG docker condor               # Add HTCondor to the Docker group so it can manage the containers
+
+```
+In the three nodes, next lines are added when running `vim /etc/condor/condor_config`:
+```
+DOCKER_VOLUMES = BDP1_2022                  # Name of the Docker Volume that HTCondor creates
+DOCKER_VOLUME_DIR_BDP1_2022 = /data2        # Host path where HTCondor stores the Docker Volume
+DOCKER_MOUNT_VOLUMES = BDP1_2022            # Docker Volume that HTCondor mounts
+```
+Running HTCondor with the new configuration file:
+```
+systemctl restart condor
+systemctl enable condor
+```
+Checking all HTCondor nodes have Docker installed and have the volume mounted with `condor_status -l | grep -i docker`:
+
+![image](https://github.com/jesusch10/bdp1-project/assets/136498796/1473a2f6-7e08-4d4d-a26c-0e86c53fc5ae)
+
+
