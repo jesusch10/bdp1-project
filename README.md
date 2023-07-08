@@ -121,6 +121,13 @@ cd bwa-0.7.15/
 make
 chmod 777 /data2/             # Change the permissions so the master and the nodes can read, write, and execute in the volume
 ```
+## 2.5 Running a BWA test:
+```
+cd ~
+vim bwa_batch.job             # Written content is in the "bwa_batch.job" file of this repository
+vim align.py                  # Written content is in the "align.py" file of this repository
+
+```
 ## 3. HPC site:
 The HPC site is designed to speeds up the individual job as much possible. It consists of one master node (`hpc-instance`, which runs the job) and one working node (`storage-1`, which stores the output alignment files), both running the CentOS 7 operating system with e2-standard-8 (8 vCPUs and 32 GB of memory) and (2 vCPUs and 1 GB of memory) type machines, respectively. Since both sites belong to the same Google Cloud project, they share the same SSH key.
 
