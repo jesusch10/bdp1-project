@@ -128,7 +128,7 @@ In the `htc-instance`:
 cd ~
 vim bwa_batch.job                 # Written content is in the "bwa_batch.job" file of this repository
 vim align.py                      # Written content is in the "align.py" file of this repository
-condor_submit bwa_batch . job     # Job submission as NORMAL user, not root
+condor_submit bwa_batch.job     # Job submission as NORMAL user, not root
 ```
 Retrieving information about jobs in queue with `condor_q`:
 
@@ -141,7 +141,6 @@ Checking the three nodes in the cluster are working with `condor_status`:
 After checking the time taken by each job with `cat read_*.out | grep "Total execution time:"`, the average execution time per single job is 86.828 seconds:
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/7867b4d9-8fa3-4b33-8ec0-3a1b46b70b20)
-
 
 The time results among nodes are not very consistent because of the geographical distribution and CPU usage, which is slowed down probably due to an excessive use of RAM.  Therefore, in the next HPC site, the challenge is performed in a machine containing more than 8 GB of RAM (minimum recommended for BWA).
 
@@ -187,8 +186,8 @@ Thanks to the previous firewall rules created for the site 1, it is not necessar
 ### 3.3 Running a BWA test:
 ```
 cd /data2/BDP1_2022/hg19
-vim align.py                                       # Written content is in the "align.py" file of this repository
-python align.py ./Patients/patient1/read_1.fa      # This command is executed several times changing the number of cores of the instance
+vim align.py                                                           # Written content is in the "align.py" file of this repository
+python align.py /data2/BDP1_2022/hg19/Patients/patient1/read_1.fa      # This command is executed several times changing the number of cores of the instance
 ```
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/43014e8b-0197-4fbd-8d61-f5bc4e305a28)
