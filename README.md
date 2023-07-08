@@ -13,13 +13,14 @@ Commands below show how to create a SSH key along with its `.pub` file that then
 ssh-keygen -t rsa -f ./key_project
 ssh -i key_project jesus@<instance_external_ip>
 ```
-A storage site is created with 50GB and interconnected to the `htc-instance` through Google Cloud. Then, next firewall entry rules are configured:
+Next firewall entry rules are configured:
 1. Transmission Control Protocol (TCP) for 0 - 65535 ports, so the nodes are able to communicate between them through HTCondor, and to share a volume through the Network File System server (NFS).
 2. Internet Control Message Protocol (ICMP) for all ports, so the ping requests are allowed.
 3. TCP for 22 port, so the Secure Shell (SSh) is allowed.
 
 ![image](https://github.com/jesusch10/bdp1-project/assets/136498796/1b4b9ff4-4c6f-465b-8f75-24a9c7894c9c)
 
+A storage site is created with 50GB interconnected to the `htc-instance` through Google Cloud, and then mounted with:
 ```
 sudo su                       # Become superuser
 fdisk /dev/sdb                # Access the partition menu and type commands: p, n, p (keep defaults), w
